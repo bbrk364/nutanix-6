@@ -1,0 +1,39 @@
+//How to Enable, Disable, and Verify LACP in AHV
+//check the bond name and Bridge/Switch name? 
+nutanix@CVM:~$ manage_ovs show_uplinks 
+
+//Example
+======================================
+nutanix@CVM:~$ manage_ovs show_uplinks
+Bridge br1: ---> Bridge/Switch name
+  Uplink ports: br1-up ---> bond name
+  Uplink ifaces: eth1 eth0
+
+Bridge br0: ---> Bridge/Switch name
+  Uplink ports: br0-up ---> bond name
+  Uplink ifaces: eth3 eth2
+====================================
+
+//Configure LACP in AHV
+root@AHV # ovs-vsctl set port br0-up other_config:lacp-fallback-ab=true
+root@AHV # ovs-vsctl set port br0-up other_config:lacp-time=fast
+root@AHV # ovs-vsctl set port br0-up bond_mode=balance-tcp && ovs-vsctl set port br0-up lacp=active
+
+//Verify if LACP is Configured in AHV
+root@AHV # ovs-appctl bond/show br0-up | more   
+root@AHV # ovs-appctl lacp/show br0-up | more
+
+//Disable LACP on the Host
+root@AHV # ovs-vsctl set port br0-up lacp=off
+
+//Assign VLAN AHV
+root@ahv# ovs-vsctl set port br0 tag=host_vlan_tag
+
+//UNASSIGN vlan AHV.
+root@ahv# ovs-vsctl remove port br0 tag=host_vlan_tag
+
+//Verify VLAN tagging
+root@ahv# ovs-vsctl list port br0
+
+//Assign Vlan CVM
+nutanix@cvm$ change_cvm_vlan 10
