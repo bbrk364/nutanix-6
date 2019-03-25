@@ -1,0 +1,8 @@
+//vSphere
+root@esx# /ipmitool -v -U ADMIN -P ADMIN lan print 1
+
+//Hyper-V
+> ipmiutil lan -r -U ADMIN -P ADMIN 
+
+//AHV
+root@ahv# ipmitool -v -U ADMIN -P ADMIN lan print 1
